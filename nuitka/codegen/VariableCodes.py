@@ -236,6 +236,8 @@ def getPickedCType(variable, context):
 def decideLocalVariableCodeType(context, variable):
     # Now must be local or temporary variable.
 
+    # Complexity should be moved out of here, pylint: disable=too-many-branches
+
     user = context.getOwner()
     owner = variable.getOwner()
 
@@ -252,6 +254,11 @@ def decideLocalVariableCodeType(context, variable):
         owner = entry_point
 
     c_type = getPickedCType(variable, context)
+
+    # TODO: Steer this decision to be not calculated, and potentially use
+    # C bool for indicator variables.
+    if variable.isTempVariableBool():
+        assert c_type.c_type == "nuitka_bool"
 
     if owner is user:
         result = _getVariableCodeName(in_context=False, variable=variable)
